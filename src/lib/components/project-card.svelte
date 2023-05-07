@@ -1,8 +1,8 @@
 <script>
-  export let url = ''
-  export let name = ''
-  export let slug = ''
-  export let description = ''
+  export let url = '';
+  export let name = '';
+  export let slug = '';
+  export let description = '';
 </script>
 
 <div class="relative group card shadow-2xl col-span-2">

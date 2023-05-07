@@ -1,0 +1,26 @@
+<svg class="logo__small logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                   <defs>
+                       <style>.logo__small--c{fill:url(#e);}</style>
+                       <linearGradient id="e" x2="120" y1="60" y2="60" gradientUnits="userSpaceOnUse">
+                           <stop stop-color="#fad11c" offset="0"/>
+                           <stop stop-color="#e8a534" offset=".09502"/>
+                           <stop stop-color="#d06954" offset=".23417"/>
+                           <stop stop-color="#be3e6b" offset=".353"/>
+                           <stop stop-color="#b3247a" offset=".44537"/>
+                           <stop stop-color="#af1a7f" offset=".5"/>
+                           <stop stop-color="#914194" offset=".57574"/>
+                           <stop stop-color="#7763a5" offset=".65635"/>
+                           <stop stop-color="#637eb3" offset=".73874"/>
+                           <stop stop-color="#5491bd" offset=".82249"/>
+                           <stop stop-color="#4c9cc3" offset=".90844"/>
+                           <stop stop-color="#49a0c5" offset="1"/>
+                       </linearGradient>
+                   </defs>
+                   <g data-name="letter_c">
+                       <path class="logo__small--c" d="M60,0a60,60,0,1,0,60,60A60,60,0,0,0,60,0Zm0,100a40,40,0,1,1,40-40A40,40,0,0,1,60,100Z"/>
+                       <g class="logo__el logo__el--bigc">
+                           <path d="m82.188 93.282a40.004 40.004 0 1 1 -0.78907 -67.069l10.699-16.894a59.995 59.995 0 1 0 1.1835 100.6z"/>
+                           <path d="m120 60l-1 1h1"/>
+                       </g>
+                   </g>
+               </svg>

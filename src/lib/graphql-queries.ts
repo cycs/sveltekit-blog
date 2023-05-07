@@ -1,4 +1,4 @@
-import { gql } from 'graphql-request'
+import { gql } from 'graphql-request';
 export const authorsQuery = gql`
   query GetAuthors {
     authors {
@@ -11,7 +11,7 @@ export const authorsQuery = gql`
       }
     }
   }
-`
+`;
 
 const PROJECT_FRAGMENT = gql`
   fragment ProjectDetails on Project {
@@ -25,7 +25,7 @@ const PROJECT_FRAGMENT = gql`
       url
     }
   }
-`
+`;
 
 export const projectsQuery = gql`
   ${PROJECT_FRAGMENT}
@@ -34,7 +34,7 @@ export const projectsQuery = gql`
       ...ProjectDetails
     }
   }
-`
+`;
 
 export const projectQuery = gql`
   ${PROJECT_FRAGMENT}
@@ -43,7 +43,7 @@ export const projectQuery = gql`
       ...ProjectDetails
     }
   }
-`
+`;
 
 const POST_FRAGMENT = gql`
   fragment PostDetails on Post {
@@ -59,7 +59,7 @@ const POST_FRAGMENT = gql`
       name
     }
   }
-`
+`;
 
 export const postsQuery = gql`
   ${POST_FRAGMENT}
@@ -68,7 +68,7 @@ export const postsQuery = gql`
       ...PostDetails
     }
   }
-`
+`;
 
 export const postQuery = gql`
   ${POST_FRAGMENT}
@@ -77,7 +77,7 @@ export const postQuery = gql`
       ...PostDetails
     }
   }
-`
+`;
 
 export const socialsQuery = gql`
   query GetSocials {
@@ -87,7 +87,7 @@ export const socialsQuery = gql`
       facebookUrl
     }
   }
-`
+`;
 
 export const siteMetadataQuery = gql`
   query GetProjectMetadatas {
@@ -104,4 +104,4 @@ export const siteMetadataQuery = gql`
       }
     }
   }
-`
+`;

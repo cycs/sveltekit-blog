@@ -1,21 +1,23 @@
 <script>
-  import { page } from '$app/stores'
-  import Head from '$components/head.svelte'
-  import { siteMetadataStore } from '$stores/site-metadata'
-  import { marked } from 'marked'
-  import { onMount } from 'svelte'
-  export let data
-  let pathname
+  import { page } from '$app/stores';
+  import Head from '$components/head.svelte';
+  import { siteMetadataStore } from '$stores/site-metadata.ts';
+  import { marked } from 'marked';
+  import { onMount } from 'svelte';
+  export let data;
+  let pathname;
 
   onMount(async () => {
-    pathname = $page.url.pathname
-  })
+    pathname = $page.url.pathname;
+  });
 
   const {
     siteUrl,
     name: siteName,
     openGraphDefaultImage,
-  } = $siteMetadataStore || []
+  } = $siteMetadataStore || [];
+
+  console.log(siteUrl);
 </script>
 
 <Head

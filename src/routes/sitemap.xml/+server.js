@@ -1,11 +1,11 @@
-import { client } from '$lib/graphql-client'
-import { gql } from 'graphql-request'
+import { client } from '$lib/graphql-client';
+import { gql } from 'graphql-request';
 
 const sitemap = (
   posts,
   projects,
   pages,
-  siteUrl
+  siteUrl,
 ) => `<?xml version="1.0" encoding="UTF-8" ?>
 <urlset
   xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
@@ -22,38 +22,38 @@ const sitemap = (
   </url>
   ${pages
     .map(
-      page => `
+      (page) => `
   <url>
     <loc>${siteUrl}/${page}</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
-  `
+  `,
     )
     .join('')}
   ${posts
     .map(
-      post => `
+      (post) => `
   <url>
     <loc>${siteUrl}/posts/${post.slug}</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
-  `
+  `,
     )
     .join('')}
   ${projects
     .map(
-      project => `
+      (project) => `
   <url>
     <loc>${siteUrl}/projects/${project.slug}</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
-  `
+  `,
     )
     .join('')}
-</urlset>`
+</urlset>`;
 
 export const GET = async () => {
   const query = gql`
@@ -72,20 +72,18 @@ export const GET = async () => {
         slug
       }
     }
-  `
+  `;
 
-  const { projectMetadatas, posts, projects } = await client.request(
-    query
-  )
-  const { siteUrl } = projectMetadatas[0]
+  const { projectMetadatas, posts, projects } = await client.request(query);
+  const { siteUrl } = projectMetadatas[0];
 
-  const pages = [`projects`, `posts`, `about`]
-  const body = sitemap(posts, projects, pages, siteUrl)
+  const pages = [`projects`, `posts`, `about`];
+  const body = sitemap(posts, projects, pages, siteUrl);
 
   return new Response(body, {
     headers: {
       'Cache-Control': 'max-age=0, s-maxage=3600',
       'Content-Type': 'application/xml',
     },
-  })
-}
+  });
+};
