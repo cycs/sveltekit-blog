@@ -4,23 +4,21 @@
     fetchAuthors,
     fetchSocials,
     socialsStore,
-  } from '$stores/site-metadata'
-  import FacebookIcon from './facebook-icon.svelte'
-  import TwitterIcon from './twitter-icon.svelte'
-  import YouTubeIcon from './you-tube-icon.svelte'
+  } from '$stores/site-metadata';
+  import FacebookIcon from './facebook-icon.svelte';
+  import TwitterIcon from './twitter-icon.svelte';
+  import YouTubeIcon from './you-tube-icon.svelte';
 
-  fetchAuthors()
-  fetchSocials()
+  fetchAuthors();
+  fetchSocials();
 </script>
 
 <script>
-  const { twitterUrl, youTubeUrl, facebookUrl } = $socialsStore
-  const { name: AuthorName } = $authorsStore
+  const { twitterUrl, youTubeUrl, facebookUrl } = $socialsStore;
+  const { name: AuthorName } = $authorsStore;
 </script>
 
-<footer
-  class="p-10 footer bg-primary text-primary-content footer-center"
->
+<footer class="p-10 footer bg-primary text-primary-content footer-center">
   <div class="grid grid-flow-col gap-4">
     <a class="link link-hover" href="/projects">Portfolio</a>
     <a class="link link-hover" href="/posts">Blog</a>

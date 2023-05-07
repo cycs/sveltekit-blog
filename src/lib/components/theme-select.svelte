@@ -3,9 +3,7 @@
     data-choose-theme
     class="pr-9 select select-bordered select-primary bg-base-100 select-xs text-base-content"
   >
-    <option disabled="disabled" selected="selected"
-      >Choose a theme</option
-    >
+    <option disabled="disabled" selected="selected">Choose a theme</option>
     <option value="aqua">Aqua</option>
     <option value="black">Black</option>
     <option value="bumblebee">Bumblebee</option>
@@ -26,6 +24,6 @@
     <option value="retro">Retro</option>
     <option value="synthwave">Synthwave</option>
     <option value="valentine">Valentine</option>
-    <option value="wireframe">Wireframe</option>
+    <!-- <option value="wireframe">Wireframe</option> -->
   </select>
 </div>
