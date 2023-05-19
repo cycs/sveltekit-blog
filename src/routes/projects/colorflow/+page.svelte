@@ -1,10 +1,72 @@
 <script lang="ts">
   import defaultImage from '../../../assets/img/img_init.jpg';
-  // import { siteMetadataStore } from '$stores/site-metadata.ts'
-  import { onMount } from 'svelte';
-  import { getAllColors } from '../../../lib/colorflow/helpers/getAllColors';
 
-  onMount(async () => {
+  // import { siteMetadataStore } from '$stores/site-metadata.ts'
+  import { getContext, onMount } from 'svelte';
+  import { getAllColors } from '../../../lib/components/colorflow/helpers/getAllColors';
+  import ColorRange from '$components/colorflow/ColorRange/index.svelte';
+  import { get } from 'svelte/store';
+
+  // const message = getContext<number>('numberOfColors');
+
+  let currentMessage;
+
+  const splits = getContext<number>('numberOfColors');
+  let message = getContext<number>('numberOfColors');
+
+  message.subscribe((value) => {
+    currentValue = value;
+    console.log('Current Value:', currentValue);
+  });
+  console.log(message);
+  $: {
+    // const splitxs = getContext<number>('numberOfColors');
+    // currentMessage = get(message);
+
+    console.log('Current Message:', message);
+  }
+
+  onMount(() => {
+    // currentMessage = get(message);
+    // const fileInput = document.querySelector(
+    //   '.upload__image',
+    // ) as HTMLInputElement;
+    const uploadButton = document.querySelector('.upload') as HTMLDivElement;
+
+    const upload = document.querySelector('.upload__image') as HTMLInputElement;
+
+    console.log(upload);
+    // upload?.addEventListener('change', (e) => {
+    //   console.log('CLICK');
+    // });
+    if (!upload) {
+      return;
+    }
+    uploadButton.addEventListener('click', () => upload.click());
+    console.log('CHANGE');
+    upload.addEventListener('change', (e) => {
+      const uploadOverlay = document.querySelector('.upload');
+      const inputElement = e.target as HTMLInputElement;
+
+      let files = inputElement.files || [];
+      const file = files[0];
+
+      const reader = new FileReader();
+      console.log('CLICK', reader);
+
+      if (!file) return;
+      reader.readAsDataURL(file);
+      reader.onload = function (e) {
+        if (e.target?.readyState == FileReader.DONE) {
+          firstVisit = false;
+          uploadOverlay?.classList.add('upload--hidden');
+          uploadButton?.classList.add('upload__icon--topcorner');
+
+          img.src = typeof e.target.result === 'string' ? e.target.result : '';
+        }
+      };
+    });
+
     let canvas = document.getElementById('canvas') as HTMLCanvasElement,
       canvas2 = document.getElementById('canvas2') as HTMLCanvasElement,
       canvas3 = document.getElementById('canvas3') as HTMLCanvasElement;
@@ -114,7 +176,7 @@
       const sourceBuffer8 = new Uint8ClampedArray(data.data.buffer);
       const sourceBuffer32 = new Int32Array(data.data.buffer);
 
-      getAllColors(sourceBuffer8, sourceBuffer32);
+      getAllColors(splits, sourceBuffer8, sourceBuffer32);
 
       // if (init) {
       //   init = !init;
@@ -122,37 +184,37 @@
 
       /* change the numbers of colors */
       // let radial = document.querySelector('.radial__colors .radial__input');
-      let radialCircle = document.querySelector('.radial__colors .circle');
+      // let radialCircle = document.querySelector('.radial__colors .circle');
       // radialKey = radial?.dataset?.key,
-      let isDragging = false;
+      // let isDragging = false;
 
-      if (radialCircle) {
-        radialCircle.addEventListener('mousedown', () => (isDragging = true));
-        radialCircle.addEventListener('touchstart', () => (isDragging = true), {
-          passive: true,
-        });
-      }
+      // if (radialCircle) {
+      //   radialCircle.addEventListener('mousedown', () => (isDragging = true));
+      //   radialCircle.addEventListener('touchstart', () => (isDragging = true), {
+      //     passive: true,
+      //   });
+      // }
 
-      document.addEventListener('touchend', () => {
-        /* recalculate on change (numbers of colors) */
-        if (isDragging) {
-          let dataBuffer = ctx3?.getImageData(
-            0,
-            0,
-            canvas3.width,
-            canvas3.height,
-          );
-          let sourceBuffer8 = new Uint8ClampedArray(
-            dataBuffer?.data.buffer as ArrayBuffer,
-          );
-          let sourceBuffer32 = new Int32Array(
-            dataBuffer?.data.buffer as ArrayBuffer,
-          );
+      // document.addEventListener('touchend', () => {
+      //   /* recalculate on change (numbers of colors) */
+      //   if (isDragging) {
+      //     let dataBuffer = ctx3?.getImageData(
+      //       0,
+      //       0,
+      //       canvas3.width,
+      //       canvas3.height,
+      //     );
+      //     let sourceBuffer8 = new Uint8ClampedArray(
+      //       dataBuffer?.data.buffer as ArrayBuffer,
+      //     );
+      //     let sourceBuffer32 = new Int32Array(
+      //       dataBuffer?.data.buffer as ArrayBuffer,
+      //     );
 
-          getAllColors(sourceBuffer8, sourceBuffer32);
-        }
-        isDragging = false;
-      });
+      //     getAllColors(sourceBuffer8, sourceBuffer32);
+      //   }
+      //   isDragging = false;
+      // });
       // document.addEventListener('mouseup', function () {
       //   // recalculate on change (numbers of colors)
       //   if (isDragging) {
@@ -253,7 +315,13 @@
       <div class="upload__icon">Upload file icon</div>
       <div class="upload">
         <span>Drag &amp; drop ton image ici</span>
-        <input class="upload__image" type="file" name="pic" accept="image/*" />
+        <input
+          class="upload__image"
+          type="file"
+          name="pic"
+          accept="image/*"
+          style="display:none;"
+        />
       </div>
     </div>
     <p class="canvas__advice">
@@ -269,11 +337,7 @@
       </p>
     </li>
     <li class="radial radial__colors">
-      <span class="radial__label title title--normal">Nombre de couleurs</span>
-      <div class="radial__input title title--normal" />
-      <div class="circle circle--invert">
-        <div class="radial__button" />
-      </div>
+      <ColorRange />
     </li>
   </ul>
 </section>

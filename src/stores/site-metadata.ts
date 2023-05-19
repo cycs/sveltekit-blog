@@ -5,10 +5,11 @@ import {
   socialsQuery,
 } from '../lib/graphql-queries';
 import { writable } from 'svelte/store';
+import { Author, ProjectMetadataType } from '$lib/graphql/types';
 
 export const socialsStore = writable([]);
-export const authorsStore = writable([]);
-export const siteMetadataStore = writable([]);
+export const authorsStore = writable({} as Author);
+export const siteMetadataStore = writable({} as ProjectMetadataType);
 
 export const fetchSocials = async () => {
   const { socials } = await client.request(socialsQuery);

@@ -1,0 +1,9 @@
+schema: <https://api-eu.hygraph.com/v2/project-id/master>
+documents:
+  - '**/*.{graphql,gql}'
+generates:
+  src/lib/graphql/types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typed-document-node

@@ -11,7 +11,7 @@ const config = {
     alias: {
       $components: path.resolve('./src/lib/components'),
       $lib: path.resolve('./src/lib'),
-      $stores: path.resolve('./src/stores'),
+      $stores: path.resolve('/src/stores'),
     },
   },
 
@@ -21,7 +21,7 @@ const config = {
       parserOptions: {
         from: undefined, // Let postcss-load-config handle the `from` option
       },
-      // postcss: true,
+      postcss: true,
     }),
   ],
 };
