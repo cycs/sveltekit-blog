@@ -2,28 +2,31 @@
   import defaultImage from '../../../assets/img/img_init.jpg';
 
   // import { siteMetadataStore } from '$stores/site-metadata.ts'
-  import { getContext, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { getAllColors } from '../../../lib/components/colorflow/helpers/getAllColors';
   import ColorRange from '$components/colorflow/ColorRange/index.svelte';
-  import { get } from 'svelte/store';
+  // import { get, writable } from 'svelte/store';
+  import { numberOfColorsContext } from '../../../shared/context';
+  // import { get } from 'svelte/store';
 
   // const message = getContext<number>('numberOfColors');
 
-  let currentMessage;
+  // let currentMessage;
+  let numberOfColorsContextValue: number;
 
-  const splits = getContext<number>('numberOfColors');
-  let message = getContext<number>('numberOfColors');
+  // const splits = getContext<number>('numberOfColors');
+  // let message = getContext<number>('numberOfColors');
 
-  message.subscribe((value) => {
-    currentValue = value;
-    console.log('Current Value:', currentValue);
+  numberOfColorsContext.subscribe((value) => {
+    numberOfColorsContextValue = value;
+    console.log('Current Value:', numberOfColorsContextValue);
   });
-  console.log(message);
+  // console.log(message);
   $: {
+    console.log(numberOfColorsContext);
     // const splitxs = getContext<number>('numberOfColors');
     // currentMessage = get(message);
-
-    console.log('Current Message:', message);
+    // console.log('Current Message:', message);
   }
 
   onMount(() => {
@@ -176,7 +179,11 @@
       const sourceBuffer8 = new Uint8ClampedArray(data.data.buffer);
       const sourceBuffer32 = new Int32Array(data.data.buffer);
 
-      getAllColors(splits, sourceBuffer8, sourceBuffer32);
+      getAllColors({
+        splits: numberOfColorsContextValue,
+        sourceBuffer8,
+        sourceBuffer32,
+      });
 
       // if (init) {
       //   init = !init;

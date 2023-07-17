@@ -19,12 +19,7 @@ export const displayCommonColors = (colors: [number[], number][]) => {
     return null;
   }
 
-  //   fetch(colorsJSON)
-  //     .then((r) => r.json())
-  //     .then((data) => {
-  //   console.log(data);
   var colorNames = getColorNamesJSON(colorsJSON);
-  console.log(colorNames);
   colorsDiv.innerHTML = '';
 
   colors.map((c, key) => {
@@ -33,10 +28,10 @@ export const displayCommonColors = (colors: [number[], number][]) => {
     let percent = c[1] + '%';
     let color = c[0][0] + c[0][1] + c[0][2] > 382 ? 'black' : 'white';
     let colorText = 'text--' + color;
-    let vbCode = hexToVBCode(hexCode);
+    // let vbCode = hexToVBCode(hexCode);
     let hsv = rgbToHsv(c[0][0], c[0][1], c[0][2]);
     let hsl = rgbToHsl(c[0][0], c[0][1], c[0][2]);
-    let cmjn = rgbToCmyk(c[0][0], c[0][1], c[0][2]);
+    let cmyk = rgbToCmyk(c[0][0], c[0][1], c[0][2]);
     let lab = rgbToLab(c[0][0], c[0][1], c[0][2]);
 
     let mostSimilarColor = getMostSimilarColor(colorNames, lab);
@@ -77,7 +72,7 @@ export const displayCommonColors = (colors: [number[], number][]) => {
     });
 
     li.addEventListener('click', () =>
-      displayCodes(mostSimilarColor.name, hsv, cmjn, lab, hsl, hexCode, [
+      displayCodes(mostSimilarColor.name, hsv, cmyk, lab, hsl, hexCode, [
         c[0][0],
         c[0][1],
         c[0][2],
@@ -90,7 +85,6 @@ export const displayCommonColors = (colors: [number[], number][]) => {
   lis.forEach((l) => {
     (l as HTMLElement).style.background = (l as HTMLElement).dataset.hex || '';
   });
-  // });
 };
 
 const displayCodes = (
@@ -113,8 +107,6 @@ const displayCodes = (
     cmjnSpan = document.querySelector('.code__cmjn .code__color'),
     hsvSpan = document.querySelector('.code__hsv .code__color'),
     hslSpan = document.querySelector('.code__hsl .code__color');
-
-  console.log(name);
 
   const randomNum = randomNumber(name.length, name);
   const coloredWord = coloredLetter(name, randomNum, hex);

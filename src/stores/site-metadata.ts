@@ -5,7 +5,7 @@ import {
   socialsQuery,
 } from '../lib/graphql-queries';
 import { writable } from 'svelte/store';
-import { Author, ProjectMetadataType } from '$lib/graphql/types';
+import type { Author, ProjectMetadataType } from '$lib/graphql/types';
 
 export const socialsStore = writable([]);
 export const authorsStore = writable({} as Author);

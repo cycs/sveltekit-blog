@@ -1,33 +1,46 @@
 import { displayCommonColors } from './displayCommonColors';
 import { numberOfColors, sortAllColors } from './getColorNames';
 
-export const getAllColors = (
-  splits: number,
-  sourceBuffer8: Uint8ClampedArray,
-  sourceBuffer32: Int32Array,
-) => {
-  let splitsValue =
-    (document.querySelector('.radial__colors .radial__input') as HTMLElement)
-      ?.dataset?.key || '';
+type GetAllColorsType = {
+  splits: number;
+  sourceBuffer8: Uint8ClampedArray;
+  sourceBuffer32: Int32Array;
+};
 
-  var countColors = [],
-    last = [],
-    current = [],
-    // inputValueParsed = parseInt(splitsValue.value),
-    splits = parseInt(splitsValue);
+export const getAllColors = ({
+  splits,
+  sourceBuffer8,
+  sourceBuffer32,
+}: GetAllColorsType) => {
+  const countColors = [];
+  // const last = [];
+  let current = [];
 
-  for (var i = 0, k = 0; i < sourceBuffer8.length; i += 4, k++) {
+  for (let i = 0, k = 0; i < sourceBuffer8.length; i += 4, k++) {
     if (sourceBuffer32[k] !== 0) {
       // ignore black pixels
       current = [sourceBuffer8[i], sourceBuffer8[i + 1], sourceBuffer8[i + 2]];
-      countColors[countColors.length] = current;
+      // console.log(current);
+      if (
+        sourceBuffer8[i] <= 255 &&
+        sourceBuffer8[i + 1] <= 255 &&
+        sourceBuffer8[i + 2] <= 255
+      ) {
+        countColors.push(current);
+      }
     }
   }
-  var mappedColors = sortAllColors(
-    numberOfColors(sourceBuffer8, sourceBuffer32),
-    countColors,
-    splits,
-  );
+
+  const reducedBuffers = numberOfColors(sourceBuffer8, sourceBuffer32);
+  console.log({ countColors });
+  const mappedColors = sortAllColors({
+    reduced: reducedBuffers,
+    all: countColors.filter(
+      (a, b) => a[0] <= 255 && a[1] <= 255 && a[2] <= 255,
+    ),
+    numberOfColors: splits,
+  });
+  // console.log({ splits, mappedColors });
 
   displayCommonColors(mappedColors);
 };

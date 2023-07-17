@@ -171,29 +171,28 @@ export const rgbToHsl = (r: number, g: number, b: number) => {
   return hsl;
 };
 
+// algorithm : http://www.easyrgb.com/en/math.php
 export const getMostSimilarColor = (colorNames: Color[], lab: number[]) => {
-  // algorithm : http://www.easyrgb.com/en/math.php
-
-  let mostSimilarColors = colorNames.reduce((_, color) => {
-    const mostSimilarColor: { color: Color; dE94: number }[] = [];
+  const mostSimilarColorsde94 = colorNames.reduce((acc, color) => {
     let l1 = color.lab[0],
       a1 = color.lab[1],
       b1 = color.lab[2],
       l2 = lab[0],
       a2 = lab[1],
       b2 = lab[2],
-      wl,
-      wc,
-      wh; //Weighting factors
+      wl = 1,
+      wc = 1,
+      wh = 1; //Weighting factors
 
-    let xC1 = Math.sqrt(Math.pow(a1, 2) + Math.pow(b1, 2)),
-      xC2 = Math.sqrt(Math.pow(a2, 2) + Math.pow(b2, 2)),
-      xDL = l2 - l1,
-      xDC = xC2 - xC1,
-      xDE = Math.sqrt(
-        (l1 - l2) * (l1 - l2) + (a1 - a2) * (a1 - a2) + (b1 - b2) * (b1 - b2),
-      ),
-      xDH = xDE * xDE - xDL * xDL - xDC * xDC;
+    let xC1 = Math.sqrt(Math.pow(a1, 2) + Math.pow(b1, 2));
+    let xC2 = Math.sqrt(Math.pow(a2, 2) + Math.pow(b2, 2));
+    let xDL = l2 - l1;
+    let xDC = xC2 - xC1;
+
+    const xDE = Math.sqrt(
+      Math.pow(l1 - l2, 2) + Math.pow(a1 - a2, 2) + Math.pow(b1 - b2, 2),
+    );
+    let xDH = Math.pow(xDE, 2) - Math.pow(xDL, 2) - Math.pow(xDC, 2);
 
     if (xDH > 0) {
       xDH = Math.sqrt(xDH);
@@ -203,26 +202,147 @@ export const getMostSimilarColor = (colorNames: Color[], lab: number[]) => {
 
     let xSC = 1 + 0.045 * xC1;
     let xSH = 1 + 0.015 * xC1;
+    const DeltaL = xDL / wl;
+    const DeltaC = xDC / (wc * xSC);
+    const DeltaH = xDH / (wh * xSH);
 
     // color difference formula that calculates the difference between
     // two colors in the CIELAB color space
     let dE94 = Math.sqrt(
-      Math.pow(xDL, 2) + Math.pow(xDC, 2) + Math.pow(xDH, 2),
+      Math.pow(DeltaL, 2) + Math.pow(DeltaC, 2) + Math.pow(DeltaH, 2),
     );
 
     if (dE94 < 15) {
-      mostSimilarColor.push({ color, dE94 });
+      acc.push({ color, dE94 });
     }
-    return mostSimilarColor;
+    return acc;
   }, [] as { color: Color; dE94: number }[]);
 
-  let mostSimilarColor = mostSimilarColors[0];
-  mostSimilarColors.forEach((color) => {
+  const CieLab2Hue = (CIE_a: number, CIE_b: number): number => {
+    const bias = CIE_a >= 0 ? 0 : 180;
+    return (bias + (Math.atan2(CIE_b, CIE_a) * 180) / Math.PI + 360) % 360;
+  };
+
+  const round = (value: number, decimals: number): number =>
+    Number(value.toFixed(decimals));
+
+  const dtor = (degrees: number): number => (degrees * Math.PI) / 180;
+
+  const deg2rad = (degrees: number): number => (degrees * Math.PI) / 180;
+
+  const mostSimilarColorsde00 = colorNames.reduce((acc, color) => {
+    let l1 = color.lab[0],
+      a1 = color.lab[1],
+      b1 = color.lab[2],
+      l2 = lab[0],
+      a2 = lab[1],
+      b2 = lab[2];
+    const WHT_L = 1;
+    const WHT_C = 1;
+    const WHT_H = 1;
+
+    const xC1 = Math.sqrt(a1 * a1 + b1 * b1);
+    const xC2 = Math.sqrt(a2 * a2 + b2 * b2);
+    const xCX = (xC1 + xC2) / 2;
+    const xGX =
+      0.5 *
+      (1 - Math.sqrt(Math.pow(xCX, 7) / (Math.pow(xCX, 7) + Math.pow(25, 7))));
+    const xNN1 = (1 + xGX) * a1;
+    const xNN2 = (1 + xGX) * a2;
+    const xC1_ = Math.sqrt(xNN1 * xNN1 + b1 * b1);
+    const xC2_ = Math.sqrt(xNN2 * xNN2 + b2 * b2);
+    const xH1 = CieLab2Hue(xNN1, b1);
+    const xH2 = CieLab2Hue(xNN2, b2);
+    const xDL = l2 - l1;
+    const xDC = xC2_ - xC1_;
+
+    let xDH: number;
+    if (xC1_ * xC2_ === 0) {
+      xDH = 0;
+    } else {
+      const xNN = round(xH2 - xH1, 12);
+      if (Math.abs(xNN) <= 180) {
+        xDH = xH2 - xH1;
+      } else {
+        if (xNN > 180) {
+          xDH = xH2 - xH1 - 360;
+        } else {
+          xDH = xH2 - xH1 + 360;
+        }
+      }
+    }
+
+    xDH = 2 * Math.sqrt(xC1_ * xC2_) * Math.sin(dtor(xDH / 2));
+    const xLX = (l1 + l2) / 2;
+    const xCY = (xC1_ + xC2_) / 2;
+
+    let xHX: number;
+    if (xC1_ * xC2_ === 0) {
+      xHX = xH1 + xH2;
+    } else {
+      const xNN = Math.abs(round(xH1 - xH2, 12));
+      if (xNN > 180) {
+        if (xH2 + xH1 < 360) {
+          xHX = xH1 + xH2 + 360;
+        } else {
+          xHX = xH1 + xH2 - 360;
+        }
+      } else {
+        xHX = xH1 + xH2;
+      }
+      xHX /= 2;
+    }
+
+    const xTX =
+      1 -
+      0.17 * Math.cos(dtor(xHX - 30)) +
+      0.24 * Math.cos(deg2rad(2 * xHX)) +
+      0.32 * Math.cos(deg2rad(3 * xHX + 6)) -
+      0.2 * Math.cos(dtor(4 * xHX - 63));
+    const xPH = 30 * Math.exp(-Math.pow((xHX - 275) / 25, 2));
+    const xRC =
+      2 * Math.sqrt(Math.pow(xCY, 7) / (Math.pow(xCY, 7) + Math.pow(25, 7)));
+    const xSL =
+      1 +
+      (0.015 * Math.pow(xLX - 50, 2)) / Math.sqrt(20 + Math.pow(xLX - 50, 2));
+    const xSC = 1 + 0.045 * xCY;
+    const xSH = 1 + 0.015 * xCY * xTX;
+    const xRT = -Math.sin(deg2rad(2 * xPH)) * xRC;
+    const xDL_ = xDL / (WHT_L * xSL);
+    const xDC_ = xDC / (WHT_C * xSC);
+    const xDH_ = xDH / (WHT_H * xSH);
+
+    const DeltaE00 = Math.sqrt(
+      Math.pow(xDL_, 2) +
+        Math.pow(xDC_, 2) +
+        Math.pow(xDH_, 2) +
+        xRT * xDC_ * xDH_,
+    );
+
+    if (DeltaE00 < 15) {
+      // console.log(color, dE94);
+      acc.push({ color, DeltaE00 });
+    }
+    return acc;
+  }, [] as { color: Color; DeltaE00: number }[]);
+
+  let mostSimilarColor = mostSimilarColorsde94[0];
+  let mostSimilarColor00 = mostSimilarColorsde00[0];
+  mostSimilarColorsde94.forEach((color) => {
     if (color.dE94 < mostSimilarColor.dE94) {
       mostSimilarColor = color;
     }
   });
 
+  mostSimilarColorsde00.forEach((color) => {
+    if (color.DeltaE00 < mostSimilarColor00.DeltaE00) {
+      mostSimilarColor00 = color;
+    }
+  });
+
+  console.log({ mostSimilarColor00, mostSimilarColor });
+
+  // return mostSimilarColor00?.color || '';
   return mostSimilarColor?.color || '';
 };
 
@@ -330,17 +450,22 @@ export const rgbToHex = (r: number, g: number, b: number) => {
   return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
 };
 
-export const sortAllColors = (
-  reduced: number[][],
-  all: number[][],
-  splits: number,
-) => {
-  let median = medianCut(reduced);
+type SortAllColorsType = {
+  reduced: number[][];
+  all: number[][];
+  numberOfColors: number;
+};
+export const sortAllColors = ({
+  reduced,
+  all,
+  numberOfColors,
+}: SortAllColorsType) => {
+  let median = medianCut(reduced || []);
 
   let key = parseInt(Object.keys(median)[0]);
   let dominantSort = sortByDominantColor(all, key);
 
-  let mappedColors = getBucketsSplit(dominantSort, median, splits);
+  let mappedColors = getBucketsSplit(dominantSort, median, numberOfColors);
 
   return mappedColors;
 };
@@ -352,20 +477,21 @@ export const getBucketsSplit = (
   },
   splits: number,
 ) => {
-  //   let bucket = [];
+  let bucket: number[][][] = [];
   let count = 0;
   let increment = 2;
 
-  let splitBucket = twoBucketSplit(dominantSort, median);
+  console.log(dominantSort);
 
+  let splitBucket = twoBucketSplit(dominantSort, median, bucket);
   while (increment < splits) {
     let medianCut1 = medianCut(splitBucket[count]);
-    // let key1 = parseInt(Object.keys(medianCut1)[0]);
 
     let lastCount = count;
     count = count + 1;
+    console.log(dominantSort, splitBucket[lastCount]);
 
-    splitBucket = twoBucketSplit(splitBucket[lastCount], medianCut1);
+    splitBucket = twoBucketSplit(splitBucket[lastCount], medianCut1, bucket);
 
     /* Remove the non-split sub bucket*/
     splitBucket = splitBucket.slice(count, splitBucket.length);
@@ -375,9 +501,8 @@ export const getBucketsSplit = (
 
   /* Prevent getting empty arrays if number of colors is less than number of splits */
   var NoEmptyBucket = splitBucket.filter((bucket) => bucket.length != 0);
-
+  console.log({ splitBucket });
   var mappedColors = averageColor(NoEmptyBucket);
-
   return mappedColors;
 };
 
@@ -414,6 +539,7 @@ const sortByBucketSize = (buckets: number[][][]) => {
     return [b, percentage];
   });
 
+  console.log(buckets);
   return sortedBuckets;
 };
 
@@ -421,15 +547,17 @@ export const averageColor = (buckets: number[][][]) => {
   var mappedColors: [number[], number][] = [];
 
   var bucketsSorted = sortByBucketSize(buckets);
-
+  console.log({ bucketsSorted });
   bucketsSorted.forEach((bucket) => {
-    const reduced = bucket[0].reduce((accumulator, val) => {
-      accumulator[0] = accumulator[0] + val[0];
-      accumulator[1] = accumulator[1] + val[1];
-      accumulator[2] = accumulator[2] + val[2];
+    const reduced = bucket[0]
+      .filter((a, b) => a[0] <= 255 && a[1] <= 255 && a[2] <= 255)
+      .reduce((accumulator, val) => {
+        accumulator[0] = accumulator[0] + val[0];
+        accumulator[1] = accumulator[1] + val[1];
+        accumulator[2] = accumulator[2] + val[2];
 
-      return accumulator;
-    });
+        return accumulator;
+      });
 
     const zero = Math.round(reduced[0] / bucket[0].length);
     const one = Math.round(reduced[1] / bucket[0].length);
@@ -438,6 +566,8 @@ export const averageColor = (buckets: number[][][]) => {
     const color = [zero, one, two];
     mappedColors.push([color, bucket[1]]);
   });
+
+  console.log(bucketsSorted, mappedColors);
 
   return mappedColors;
 };
@@ -488,7 +618,7 @@ export const medianCut = (colors: number[][]) => {
     bMin = 255,
     bMax = 0;
 
-  for (var i = 0; i < colors.length; i++) {
+  for (var i = 0; i < colors?.length; i++) {
     var r = colors[i][0];
     var g = colors[i][1];
     var b = colors[i][2];
@@ -526,11 +656,11 @@ export const twoBucketSplit = (
   median: {
     [key: string]: number;
   },
+  bucket: number[][][],
 ) => {
   var key = Number(Object.keys(median)[0]);
   //   const bucketLengthFloor = Math.floor(colors.length / 2);
   //   const bucketLengthCeil = Math.ceil(colors.length / 2);
-
   let bucket1: number[][] = [];
   let bucket2: number[][] = [];
 
@@ -542,7 +672,11 @@ export const twoBucketSplit = (
     }
   });
 
-  return [bucket1, bucket2];
+  console.log({ colors, median, bucket, bucket1, bucket2 });
+
+  bucket.push(bucket1, bucket2);
+
+  return bucket;
 };
 
 const sortByDominantColor = (arrayColors: number[][], key: number) => {
