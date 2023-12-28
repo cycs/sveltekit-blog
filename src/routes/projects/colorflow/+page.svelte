@@ -1,281 +1,179 @@
 <script lang="ts">
   import defaultImage from '../../../assets/img/img_init.jpg';
 
-  // import { siteMetadataStore } from '$stores/site-metadata.ts'
-  // import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { getAllColors } from '../../../lib/components/colorflow/helpers/getAllColors';
   import ColorRange from '$components/colorflow/ColorRange/index.svelte';
   import Drawer from '$components/Drawer/index.svelte';
-  // import { get, writable } from 'svelte/store';
+  import { browser } from '$app/environment';
 
   import {
     numberOfColorsStore,
     toggleColorFlowDrawer,
   } from '../../../shared/context';
-  // import { get } from 'svelte/store';
 
-  // const message = getContext<number>('numberOfColors');
+  let firstVisit = true;
+  let img = browser ? new Image() : null;
+  let fileinput: HTMLInputElement;
+  let sourceBuffer8: Uint8ClampedArray = new Uint8ClampedArray();
+  let sourceBuffer32: Int32Array = new Int32Array();
 
-  // let currentMessage;
-  // let numberOfColorsStoreValue: number;
+  const onFileSelected = (e: Event) => {
+    const inputElement = e.target as HTMLInputElement;
 
-  // const splits = getContext<number>('numberOfColors');
-  // let message = getContext<number>('numberOfColors');
+    let files = inputElement.files || [];
+    const file = files[0];
 
-  // numberOfColorsStore.subscribe((value) => {
-  //   numberOfColorsStoreValue = value;
-  //   console.log('Current Value:', numberOfColorsStoreValue);
-  // });
-  // console.log(message);
-  // $: {
-  //   console.log(numberOfColorsStore);
-  //   // const splitxs = getContext<number>('numberOfColors');
-  //   // currentMessage = get(message);
-  //   // console.log('Current Message:', message);
-  // }
+    const reader = new FileReader();
 
-  $: {
-    // currentMessage = get(message);
-    // const fileInput = document.querySelector(
-    //   '.upload__image',
-    // ) as HTMLInputElement;
-    const uploadButton = document.querySelector('.upload') as HTMLDivElement;
+    if (!file) return;
+    reader.readAsDataURL(file);
+    reader.onload = function (e) {
+      if (e.target?.readyState == FileReader.DONE) {
+        firstVisit = false;
 
-    const upload = document.querySelector('.upload__image') as HTMLInputElement;
-
-    if (!upload) {
-      return;
-    }
-    uploadButton.addEventListener('click', () => upload.click());
-    console.log('CHANGE');
-    upload.addEventListener('change', (e) => {
-      const uploadOverlay = document.querySelector('.upload');
-      const inputElement = e.target as HTMLInputElement;
-
-      let files = inputElement.files || [];
-      const file = files[0];
-
-      const reader = new FileReader();
-      console.log('CLICK', reader);
-
-      if (!file) return;
-      reader.readAsDataURL(file);
-      reader.onload = function (e) {
-        if (e.target?.readyState == FileReader.DONE) {
-          firstVisit = false;
-          uploadOverlay?.classList.add('upload--hidden');
-          uploadButton?.classList.add('upload__icon--topcorner');
-
+        if (img) {
           img.src = typeof e.target.result === 'string' ? e.target.result : '';
         }
-      };
-    });
+      }
+    };
+  };
 
-    let canvas = document.getElementById('canvas') as HTMLCanvasElement,
-      canvas2 = document.getElementById('canvas2') as HTMLCanvasElement,
+  const drawImage = (numberOfColorsStore: number) => {
+    let canvas: HTMLCanvasElement | undefined = undefined;
+    let canvas2: HTMLCanvasElement | undefined = undefined;
+    let canvas3: HTMLCanvasElement | undefined = undefined;
+
+    if (browser) {
+      canvas = document.getElementById('canvas') as HTMLCanvasElement;
+      canvas2 = document.getElementById('canvas2') as HTMLCanvasElement;
       canvas3 = document.getElementById('canvas3') as HTMLCanvasElement;
+    }
+
     let data: ImageData;
 
-    if (!canvas) {
+    if (!canvas || !canvas3) {
       return null;
     }
-    // upload = document.querySelector('.upload__image'),
-    // getColorsButton = document.querySelector('.getcolors'),
     const ctx = canvas.getContext('2d');
-    // const ctx2 = canvas2.getContext('2d');
     const ctx3 = canvas3.getContext('2d');
-
-    let img = new Image();
-    let firstVisit = true;
-
-    img.onload = () => {
-      if (!firstVisit) {
-        document?.querySelector('.description')?.classList.add('hide');
+    if (img) {
+      if (!img.src) {
+        img.src = defaultImage;
       }
+      img.onload = () => {
+        let largest = 600;
 
-      let largest = 600;
+        let largestSmall = 100,
+          highest = 400;
 
-      let checked =
-        document.querySelector('.tgl[type="checkbox"]:checked') === null
-          ? false
-          : true;
-      let largestSmall = 100,
-        highest = 400;
+        if (img && canvas && canvas2 && canvas3) {
+          if (img.width > img.height) {
+            if (img.height > highest && img.width < largest) {
+              const widthCanvas = img.width / (img.height / highest);
+              canvas.width = canvas2.width = widthCanvas;
+              canvas.height = canvas2.height = highest;
+            } else {
+              const heightCanvas = img.height / (img.width / largest);
+              canvas.width = canvas2.width = largest;
+              canvas.height = canvas2.height = heightCanvas;
 
-      if (checked) largestSmall = 800;
+              if (heightCanvas > 400) {
+                const widthCanvas = img.width / (img.height / 300);
+                canvas.width = canvas2.width = widthCanvas;
+                canvas.height = canvas2.height = 300;
+              }
+            }
 
-      if (img.width > img.height) {
-        if (img.height > highest && img.width < largest) {
-          var widthCanvas = img.width / (img.height / highest);
-          canvas.width = canvas2.width = widthCanvas;
-          canvas.height = canvas2.height = highest;
-        } else {
-          var heightCanvas = img.height / (img.width / largest);
-          canvas.width = canvas2.width = largest;
-          canvas.height = canvas2.height = heightCanvas;
-
-          if (heightCanvas > 400) {
-            var widthCanvas = img.width / (img.height / 300);
+            const heightCanvas3 = img.height / (img.width / largestSmall);
+            canvas3.width = largestSmall;
+            canvas3.height = heightCanvas3;
+          } else {
+            const widthCanvas = img.width / (img.height / highest);
             canvas.width = canvas2.width = widthCanvas;
-            canvas.height = canvas2.height = 300;
+            canvas.height = canvas2.height = highest;
+
+            const widthCanvas3 = img.width / (img.height / largestSmall);
+            canvas3.width = widthCanvas3;
+            canvas3.height = largestSmall;
+
+            // When the image is narrow and very high, resize to a normal ratio
+            let ratioSuperH = img.height / (img.width / 600);
+            let incH = 20;
+            while (ratioSuperH > highest) {
+              ratioSuperH = img.height / (img.width / (600 - incH));
+              incH += 100;
+            }
+            canvas.width = canvas2.width =
+              img.width / (img.height / ratioSuperH);
+            canvas.height = canvas2.height = ratioSuperH;
+          }
+
+          if (ctx) {
+            ctx.drawImage(
+              img,
+              0,
+              0,
+              img.width,
+              img.height,
+              0,
+              0,
+              canvas.width,
+              canvas.height,
+            );
+
+            data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          }
+
+          /* smaller size canvas */
+          if (ctx3) {
+            ctx3.drawImage(
+              img,
+              0,
+              0,
+              img.width,
+              img.height,
+              0,
+              0,
+              canvas3.width,
+              canvas3.height,
+            );
+            data = ctx3.getImageData(0, 0, canvas3.width, canvas3.height);
           }
         }
 
-        var heightCanvas3 = img.height / (img.width / largestSmall);
-        canvas3.width = largestSmall;
-        canvas3.height = heightCanvas3;
-      } else {
-        var widthCanvas = img.width / (img.height / highest);
-        canvas.width = canvas2.width = widthCanvas;
-        canvas.height = canvas2.height = highest;
+        /* using a new typed object is faster */
+        // const sourceBuffer8 = new Uint8ClampedArray(data.data.buffer);
+        // const sourceBuffer32 = new Int32Array(data.data.buffer);
 
-        var widthCanvas3 = img.width / (img.height / largestSmall);
-        canvas3.width = widthCanvas3;
-        canvas3.height = largestSmall;
+        sourceBuffer8 = new Uint8ClampedArray(data.data.buffer);
+        sourceBuffer32 = new Int32Array(data.data.buffer);
 
-        // When the image is narrow and very high, resize to a normal ratio
-        let ratioSuperH = img.height / (img.width / 600);
-        let incH = 20;
-        while (ratioSuperH > highest) {
-          ratioSuperH = img.height / (img.width / (600 - incH));
-          incH += 100;
-        }
-        canvas.width = canvas2.width = img.width / (img.height / ratioSuperH);
-        canvas.height = canvas2.height = ratioSuperH;
-      }
+        getAllColors({
+          splits: numberOfColorsStore,
+          sourceBuffer8,
+          sourceBuffer32,
+        });
+      };
+    }
+  };
 
-      if (ctx) {
-        ctx.drawImage(
-          img,
-          0,
-          0,
-          img.width,
-          img.height,
-          0,
-          0,
-          canvas.width,
-          canvas.height,
-        );
+  // getAllColors({
+  //   splits: numberOfColorsStore,
+  //   sourceBuffer8,
+  //   sourceBuffer32,
+  // });
 
-        data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      }
+  $: drawImage($numberOfColorsStore);
+  $: getAllColors({
+    splits: $numberOfColorsStore,
+    sourceBuffer8,
+    sourceBuffer32,
+  });
 
-      /* smaller size canvas */
-      if (ctx3) {
-        ctx3.drawImage(
-          img,
-          0,
-          0,
-          img.width,
-          img.height,
-          0,
-          0,
-          canvas3.width,
-          canvas3.height,
-        );
-        data = ctx3.getImageData(0, 0, canvas3.width, canvas3.height);
-      }
-
-      /* using a new typed object is faster */
-      const sourceBuffer8 = new Uint8ClampedArray(data.data.buffer);
-      const sourceBuffer32 = new Int32Array(data.data.buffer);
-
-      getAllColors({
-        splits: $numberOfColorsStore,
-        sourceBuffer8,
-        sourceBuffer32,
-      });
-
-      // if (init) {
-      //   init = !init;
-      // }
-
-      /* change the numbers of colors */
-      // let radial = document.querySelector('.radial__colors .radial__input');
-      // let radialCircle = document.querySelector('.radial__colors .circle');
-      // radialKey = radial?.dataset?.key,
-      // let isDragging = false;
-
-      // if (radialCircle) {
-      //   radialCircle.addEventListener('mousedown', () => (isDragging = true));
-      //   radialCircle.addEventListener('touchstart', () => (isDragging = true), {
-      //     passive: true,
-      //   });
-      // }
-
-      // document.addEventListener('touchend', () => {
-      //   /* recalculate on change (numbers of colors) */
-      //   if (isDragging) {
-      //     let dataBuffer = ctx3?.getImageData(
-      //       0,
-      //       0,
-      //       canvas3.width,
-      //       canvas3.height,
-      //     );
-      //     let sourceBuffer8 = new Uint8ClampedArray(
-      //       dataBuffer?.data.buffer as ArrayBuffer,
-      //     );
-      //     let sourceBuffer32 = new Int32Array(
-      //       dataBuffer?.data.buffer as ArrayBuffer,
-      //     );
-
-      //     getAllColors(sourceBuffer8, sourceBuffer32);
-      //   }
-      //   isDragging = false;
-      // });
-      // document.addEventListener('mouseup', function () {
-      //   // recalculate on change (numbers of colors)
-      //   if (isDragging) {
-      //     let data = ctx3?.getImageData(0, 0, canvas3.width, canvas3.height);
-      //     let sourceBuffer8 = new Uint8ClampedArray(
-      //       data?.data.buffer as ArrayBuffer,
-      //     );
-      //     let sourceBuffer32 = new Int32Array(data?.data.buffer as ArrayBuffer);
-
-      //     getAllColors(sourceBuffer8, sourceBuffer32);
-      //   }
-      //   isDragging = false;
-
-      //   /* recalculate on draw */
-      //   if (d.isDrawing) return;
-      //   var clippedRect = d.getClipRect();
-
-      //   if (Object.keys(clippedRect).length < 4 || !clippedRect) return;
-
-      //   if (clippedRect.w) {
-      //     let data = ctx.getImageData(
-      //       clippedRect.startXRatio,
-      //       clippedRect.startYRatio,
-      //       clippedRect.widthRatio,
-      //       clippedRect.heightRatio,
-      //     );
-
-      //     let sourceBuffer8 = new Uint8ClampedArray(data.data.buffer);
-      //     let sourceBuffer32 = new Int32Array(data.data.buffer);
-
-      //     getAllColors(sourceBuffer8, sourceBuffer32);
-
-      //     Object.keys(d.rect).forEach((k) => delete d.rect[k]); // Reset rectangle to avoid multiple draws on click
-      //   }
-      // });
-    };
-
-    var initialize = function () {
-      // init = true;
-      img.src = defaultImage;
-    };
-
-    // const overlay = document.querySelector('.codes__close');
-    // var hideOverlay = function () {
-    //   document.body.classList.remove('codes--active');
-    // };
-    // overlay.addEventListener('touch', hideOverlay);
-    // overlay.addEventListener('click', hideOverlay);
-
-    initialize();
-
-    console.log({ canvas, canvas2, canvas3 });
-  }
+  onMount(() => {
+    drawImage($numberOfColorsStore);
+  });
 </script>
 
 <!-- <header class="header">
@@ -311,7 +209,6 @@
 <Drawer>
   <section class="codes">
     <button class="codes__close">fermer</button>
-    <!-- <h2 class="codes__title title title--normal">Couleur</h2> -->
     <ul class="codes__list title title--normal">
       <li class="code code__hex">
         <span class="code__name">HEX</span>
@@ -352,31 +249,27 @@
       <canvas id="canvas" class="canvas__main" />
       <canvas id="canvas2" class="canvas__drawon" />
       <canvas id="canvas3" class="canvas__quality" />
-      <div class="upload__icon">Upload file icon</div>
-      <div class="upload">
-        <!-- <span>Drag &amp; drop ton image ici</span> -->
+
+      <div
+        class="upload"
+        on:click={() => {
+          fileinput.click();
+        }}
+      >
         <input
           class="upload__image"
           type="file"
           name="pic"
-          accept="image/*"
-          style="display:none;"
+          style="display:none"
+          accept=".jpg, .jpeg, .png"
+          on:change={(e) => onFileSelected(e)}
+          bind:this={fileinput}
         />
       </div>
     </div>
-    <!-- <p class="canvas__advice">
-      Sélectionne une zone de l’image pour en récupérer sa palette.
-    </p> -->
   </div>
   <ul class="controls">
-    <li class="tg-list-item">
-      <!-- <input class="tgl tgl-light" id="cb1" type="checkbox" />
-      <label class="tgl-btn" for="cb1" /> -->
-      <!-- <p class="controls__label--desktop">
-        Améliorer la précision des couleurs.
-      </p>
-    </li> -->
-    </li>
+    <li class="tg-list-item" />
     <li class="radial radial__colors">
       <ColorRange />
     </li>

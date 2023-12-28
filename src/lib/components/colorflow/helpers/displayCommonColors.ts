@@ -12,8 +12,12 @@ import {
 } from './getColorNames';
 import colorsJSON from '../../../data/colors.json';
 import { getHslMouseEffect } from './getHslMouseEffect';
+import { browser } from '$app/environment';
 
 export const displayCommonColors = (colors: [number[], number][]) => {
+  if (!browser) {
+    return null;
+  }
   const colorsDiv = document.querySelector('.palette .colors');
 
   if (!colorsDiv) {
@@ -22,7 +26,6 @@ export const displayCommonColors = (colors: [number[], number][]) => {
 
   const colorNames = getColorNamesJSON(colorsJSON);
   colorsDiv.innerHTML = '';
-  // console.log({ colorNames });
 
   for (let i = 0; i < colors.length; i++) {
     const c = colors[i];
@@ -69,8 +72,8 @@ export const displayCommonColors = (colors: [number[], number][]) => {
     colorsDiv.appendChild(li);
   }
 
-  var lis = colorsDiv.querySelectorAll('.colors__box');
-  console.log({ lis });
+  const lis = colorsDiv.querySelectorAll('.colors__box');
+
   lis.forEach((l) => {
     (l as HTMLElement).style.background = (l as HTMLElement).dataset.hex || '';
   });

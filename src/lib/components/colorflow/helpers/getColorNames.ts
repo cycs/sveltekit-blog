@@ -69,7 +69,7 @@ export const rgbToHsv = (r: number, g: number, b: number) => {
   let s: number;
   let v = max;
 
-  var d = max - min;
+  const d = max - min;
   s = max === 0 ? 0 : d / max;
 
   if (max !== min) {
@@ -320,7 +320,6 @@ export const getMostSimilarColor = (colorNames: Color[], lab: number[]) => {
     );
 
     if (DeltaE00 < 15) {
-      // console.log(color, dE94);
       acc.push({ color, DeltaE00 });
     }
     return acc;
@@ -340,9 +339,6 @@ export const getMostSimilarColor = (colorNames: Color[], lab: number[]) => {
     }
   });
 
-  // console.log({ mostSimilarColor00, mostSimilarColor });
-
-  // return mostSimilarColor00?.color || '';
   return mostSimilarColor?.color || '';
 };
 
@@ -397,7 +393,7 @@ export const getColorNamesJSON = (
 };
 
 // export const getColorNames = () => {
-//   //   var colorNames;
+//   //   const colorNames;
 
 //   /* Source : http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c */
 
@@ -414,10 +410,10 @@ export const getColorNamesJSON = (
 // };
 
 export const isAlreadyInArray = <T>(needle: T[], haystack: T[][]) => {
-  var flag = false;
-  for (var i = 0; i < haystack.length; i++) {
-    var compare = 0;
-    for (var j = 0; j < haystack[i].length; j++) {
+  let flag = false;
+  for (let i = 0; i < haystack.length; i++) {
+    let compare = 0;
+    for (let j = 0; j < haystack[i].length; j++) {
       if (needle[j] === haystack[i][j]) {
         compare++;
       }
@@ -482,6 +478,7 @@ export const getBucketsSplit = (
   let increment = 2;
 
   let splitBucket = twoBucketSplit(dominantSort, median, bucket);
+
   while (increment < splits) {
     let medianCut1 = medianCut(splitBucket[count]);
 
@@ -491,14 +488,14 @@ export const getBucketsSplit = (
     splitBucket = twoBucketSplit(splitBucket[lastCount], medianCut1, bucket);
 
     /* Remove the non-split sub bucket*/
-    splitBucket = splitBucket.slice(count, splitBucket.length);
 
     increment = increment + 1;
   }
+  splitBucket = splitBucket.slice(count, splitBucket.length);
 
   /* Prevent getting empty arrays if number of colors is less than number of splits */
-  var NoEmptyBucket = splitBucket.filter((bucket) => bucket.length != 0);
-  var mappedColors = averageColor(NoEmptyBucket);
+  const NoEmptyBucket = splitBucket.filter((bucket) => bucket.length != 0);
+  const mappedColors = averageColor(NoEmptyBucket);
   return mappedColors;
 };
 
@@ -507,7 +504,7 @@ export const getBucketsSplit = (
 //     return b.length - a.length;
 //   });
 
-//   //   var newBucket = Array.from(buckets);
+//   //   const newBucket = Array.from(buckets);
 //   const sizeBuckets = buckets.reduce((a, b) => {
 //     return a + b.length;
 //   }, 0);
@@ -539,26 +536,25 @@ const sortByBucketSize = (buckets: number[][][]) => {
 };
 
 export const averageColor = (buckets: number[][][]) => {
-  var mappedColors: [number[], number][] = [];
+  const mappedColors: [number[], number][] = [];
 
-  var bucketsSorted = sortByBucketSize(buckets);
+  const bucketsSorted = sortByBucketSize(buckets);
   bucketsSorted.forEach((bucket) => {
     const reduced = bucket[0]
-      .filter((a, b) => a[0] <= 255 && a[1] <= 255 && a[2] <= 255)
-      .reduce((accumulator, val) => {
-        accumulator[0] = accumulator[0] + val[0];
-        accumulator[1] = accumulator[1] + val[1];
-        accumulator[2] = accumulator[2] + val[2];
+      .filter((a) => a[0] <= 255 && a[1] <= 255 && a[2] <= 255)
+      .reduce(
+        (accumulator, val) => {
+          accumulator[0] = accumulator[0] + val[0];
+          accumulator[1] = accumulator[1] + val[1];
+          accumulator[2] = accumulator[2] + val[2];
 
-        return accumulator;
-      });
+          return accumulator;
+        },
+        [0, 0, 0],
+      )
+      .map((a) => Math.round(a / bucket[0].length));
 
-    const zero = Math.round(reduced[0] / bucket[0].length);
-    const one = Math.round(reduced[1] / bucket[0].length);
-    const two = Math.round(reduced[2] / bucket[0].length);
-
-    const color = [zero, one, two];
-    mappedColors.push([color, bucket[1]]);
+    mappedColors.push([reduced, bucket[1]]);
   });
 
   return mappedColors;
@@ -588,7 +584,7 @@ export const getMedian = ({
   let widest = r > g ? r : g;
   widest = widest > b ? widest : b;
 
-  var wideObj: { [key: string]: number } = {};
+  const wideObj: { [key: string]: number } = {};
   switch (widest) {
     case r:
       wideObj[0] = Math.floor((rMax + rMin) / 2);
@@ -603,17 +599,17 @@ export const getMedian = ({
 };
 
 export const medianCut = (colors: number[][]) => {
-  var rMin = 255,
-    rMax = 0,
-    gMin = 255,
-    gMax = 0,
-    bMin = 255,
-    bMax = 0;
+  let rMin = 255;
+  let rMax = 0;
+  let gMin = 255;
+  let gMax = 0;
+  let bMin = 255;
+  let bMax = 0;
 
-  for (var i = 0; i < colors?.length; i++) {
-    var r = colors[i][0];
-    var g = colors[i][1];
-    var b = colors[i][2];
+  for (let i = 0; i < colors?.length; i++) {
+    const r = colors[i][0];
+    const g = colors[i][1];
+    const b = colors[i][2];
 
     rMin = r < rMin ? r : rMin;
     rMax = r > rMax ? r : rMax;
@@ -625,9 +621,9 @@ export const medianCut = (colors: number[][]) => {
     bMax = b > bMax ? b : bMax;
   }
 
-  var rMed = rMax - rMin;
-  var gMed = gMax - gMin;
-  var bMed = bMax - bMin;
+  const rMed = rMax - rMin;
+  const gMed = gMax - gMin;
+  const bMed = bMax - bMin;
 
   const median = getMedian({
     r: rMed,
@@ -650,7 +646,7 @@ export const twoBucketSplit = (
   },
   bucket: number[][][],
 ) => {
-  var key = Number(Object.keys(median)[0]);
+  const key = Number(Object.keys(median)[0]);
   //   const bucketLengthFloor = Math.floor(colors.length / 2);
   //   const bucketLengthCeil = Math.ceil(colors.length / 2);
   let bucket1: number[][] = [];
@@ -670,7 +666,7 @@ export const twoBucketSplit = (
 };
 
 const sortByDominantColor = (arrayColors: number[][], key: number) => {
-  var dominants = arrayColors.sort(function (a, b) {
+  const dominants = arrayColors.sort(function (a, b) {
     const aA = a[key];
     const bB = b[key];
 
@@ -680,8 +676,8 @@ const sortByDominantColor = (arrayColors: number[][], key: number) => {
   return dominants;
 };
 
-// var getOffsetLeft = function (elem: HTMLElement) {
-//   var offsetLeft = 0;
+// const getOffsetLeft = function (elem: HTMLElement) {
+//   const offsetLeft = 0;
 //   do {
 //     if (!isNaN(elem.offsetLeft)) {
 //       offsetLeft += elem.offsetLeft;
@@ -691,8 +687,8 @@ const sortByDominantColor = (arrayColors: number[][], key: number) => {
 //   return offsetLeft;
 // };
 
-// var getOffsetTop = function (elem: HTMLElement) {
-//   var offsetTop = 0;
+// const getOffsetTop = function (elem: HTMLElement) {
+//   const offsetTop = 0;
 //   do {
 //     if (!isNaN(elem.offsetTop)) {
 //       offsetTop += elem.offsetTop;
@@ -732,10 +728,10 @@ export const numberOfColors = (
   let last = [] as number[];
   let current = [];
 
-  for (var i = 0, k = 0; i < sourceBuffer32.length; i += 4, k++) {
+  for (let i = 0, k = 0; i < sourceBuffer32.length; i += 4, k++) {
     if (sourceBuffer32[k] !== 0) {
       current = [sourceBuffer8[i], sourceBuffer8[i + 1], sourceBuffer8[i + 2]];
-      var every = current.every(function (element, index) {
+      const every = current.every(function (element, index) {
         return element === last[index];
       });
       if (every) {

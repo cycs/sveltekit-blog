@@ -14,7 +14,6 @@ export let isColorFlowDrawerOpenStore = writable(false);
 // };
 
 isColorFlowDrawerOpenStore.subscribe((v) => {
-  console.log({ v });
   return v;
 });
 

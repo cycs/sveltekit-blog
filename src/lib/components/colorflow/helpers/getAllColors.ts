@@ -12,16 +12,15 @@ export const getAllColors = ({
   sourceBuffer8,
   sourceBuffer32,
 }: GetAllColorsType) => {
-  console.log({ splits });
   const countColors = [];
   // const last = [];
   let current = [];
+  console.log({ sourceBuffer8, sourceBuffer32 });
 
   for (let i = 0, k = 0; i < sourceBuffer8.length; i += 4, k++) {
     if (sourceBuffer32[k] !== 0) {
       // ignore black pixels
       current = [sourceBuffer8[i], sourceBuffer8[i + 1], sourceBuffer8[i + 2]];
-      // console.log(current);
       if (
         sourceBuffer8[i] <= 255 &&
         sourceBuffer8[i + 1] <= 255 &&
