@@ -12,6 +12,7 @@ export const getAllColors = ({
   sourceBuffer8,
   sourceBuffer32,
 }: GetAllColorsType) => {
+  console.log({ splits });
   const countColors = [];
   // const last = [];
   let current = [];
@@ -32,7 +33,6 @@ export const getAllColors = ({
   }
 
   const reducedBuffers = numberOfColors(sourceBuffer8, sourceBuffer32);
-  console.log({ countColors });
   const mappedColors = sortAllColors({
     reduced: reducedBuffers,
     all: countColors.filter(
@@ -40,7 +40,6 @@ export const getAllColors = ({
     ),
     numberOfColors: splits,
   });
-  // console.log({ splits, mappedColors });
 
   displayCommonColors(mappedColors);
 };

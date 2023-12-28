@@ -11,6 +11,7 @@ import {
   coloredLetter,
 } from './getColorNames';
 import colorsJSON from '../../../data/colors.json';
+import { getHslMouseEffect } from './getHslMouseEffect';
 
 export const displayCommonColors = (colors: [number[], number][]) => {
   const colorsDiv = document.querySelector('.palette .colors');
@@ -19,10 +20,12 @@ export const displayCommonColors = (colors: [number[], number][]) => {
     return null;
   }
 
-  var colorNames = getColorNamesJSON(colorsJSON);
+  const colorNames = getColorNamesJSON(colorsJSON);
   colorsDiv.innerHTML = '';
+  // console.log({ colorNames });
 
-  colors.map((c, key) => {
+  for (let i = 0; i < colors.length; i++) {
+    const c = colors[i];
     let hexCode = rgbToHex(c[0][0], c[0][1], c[0][2]);
 
     let percent = c[1] + '%';
@@ -54,34 +57,20 @@ export const displayCommonColors = (colors: [number[], number][]) => {
     spanName.innerHTML = mostSimilarColor.name;
     li.appendChild(spanName);
 
-    li.addEventListener('mousemove', (e) => {
-      const target = e.target as HTMLElement;
+    li.addEventListener('mousemove', (e) => getHslMouseEffect(e, hsl));
 
-      const x = e.pageX - target.offsetLeft;
-      const y = e.pageY - target.offsetTop;
-
-      let hsl1 = `hsla(${hsl[0]}, ${hsl[1]}%, ${hsl[2] - 20}%, 1)`,
-        hsl2 = `hsla(${hsl[0]}, ${hsl[1]}%, ${hsl[2] - 5}%, 1)`,
-        hsl3 = `hsla(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%, 1)`;
-
-      target.style.setProperty('--x', `${x}px`);
-      target.style.setProperty('--y', `${y}px`);
-      target.style.setProperty('--color1', hsl1);
-      target.style.setProperty('--color2', hsl2);
-      target.style.setProperty('--color3', hsl3);
-    });
-
-    li.addEventListener('click', () =>
+    li.addEventListener('click', () => {
       displayCodes(mostSimilarColor.name, hsv, cmyk, lab, hsl, hexCode, [
         c[0][0],
         c[0][1],
         c[0][2],
-      ]),
-    );
+      ]);
+    });
     colorsDiv.appendChild(li);
-  });
+  }
 
   var lis = colorsDiv.querySelectorAll('.colors__box');
+  console.log({ lis });
   lis.forEach((l) => {
     (l as HTMLElement).style.background = (l as HTMLElement).dataset.hex || '';
   });
@@ -101,12 +90,12 @@ const displayCodes = (
   //   }
   document.body.classList.add('codes--active');
 
-  const hexSpan = document.querySelector('.code__hex .code__color'),
-    rgbSpan = document.querySelector('.code__rgb .code__color'),
-    labSpan = document.querySelector('.code__lab .code__color'),
-    cmjnSpan = document.querySelector('.code__cmjn .code__color'),
-    hsvSpan = document.querySelector('.code__hsv .code__color'),
-    hslSpan = document.querySelector('.code__hsl .code__color');
+  const hexSpan = document.querySelector('.code__hex .code__color');
+  const rgbSpan = document.querySelector('.code__rgb .code__color');
+  const labSpan = document.querySelector('.code__lab .code__color');
+  const cmjnSpan = document.querySelector('.code__cmjn .code__color');
+  const hsvSpan = document.querySelector('.code__hsv .code__color');
+  const hslSpan = document.querySelector('.code__hsl .code__color');
 
   const randomNum = randomNumber(name.length, name);
   const coloredWord = coloredLetter(name, randomNum, hex);

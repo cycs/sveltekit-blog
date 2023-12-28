@@ -52,6 +52,7 @@
   "dependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.1.1",
     "@types/marked": "^4.0.8",
-    "postcss-import": "^15.1.0"
+    "postcss-import": "^15.1.0",
+    "svelte-portal": "^2.2.0"
   }
 }

@@ -10,6 +10,9 @@ dependencies:
   postcss-import:
     specifier: ^15.1.0
     version: 15.1.0(postcss@8.4.6)
+  svelte-portal:
+    specifier: ^2.2.0
+    version: 2.2.0
 
 devDependencies:
   '@graphql-codegen/cli':
@@ -4508,6 +4511,10 @@ packages:
       svelte: '>=3.19.0'
     dependencies:
       svelte: 3.46.4
+
+  /svelte-portal@2.2.0:
+    resolution: {integrity: sha512-jhtZWtD6cUE2nMw46dJ5VXWYiqnER+JH+V/BmNBQ5fNP/YdsJCpJi+DemUy9msklqGb0f+wLhJPBtKHLWQvzjg==}
+    dev: false
 
   /svelte-preprocess@4.10.2(@babel/core@7.21.8)(postcss-load-config@3.1.1)(postcss@8.4.6)(svelte@3.46.4)(typescript@5.0.4):
     resolution: {integrity: sha512-aPpkCreSo8EL/y8kJSa1trhiX0oyAtTjlNNM7BNjRAsMJ8Yy2LtqHt0zyd4pQPXt+D4PzbO3qTjjio3kwOxDlA==}

@@ -2,34 +2,39 @@
   import defaultImage from '../../../assets/img/img_init.jpg';
 
   // import { siteMetadataStore } from '$stores/site-metadata.ts'
-  import { onMount } from 'svelte';
+  // import { onMount } from 'svelte';
   import { getAllColors } from '../../../lib/components/colorflow/helpers/getAllColors';
   import ColorRange from '$components/colorflow/ColorRange/index.svelte';
+  import Drawer from '$components/Drawer/index.svelte';
   // import { get, writable } from 'svelte/store';
-  import { numberOfColorsContext } from '../../../shared/context';
+
+  import {
+    numberOfColorsStore,
+    toggleColorFlowDrawer,
+  } from '../../../shared/context';
   // import { get } from 'svelte/store';
 
   // const message = getContext<number>('numberOfColors');
 
   // let currentMessage;
-  let numberOfColorsContextValue: number;
+  // let numberOfColorsStoreValue: number;
 
   // const splits = getContext<number>('numberOfColors');
   // let message = getContext<number>('numberOfColors');
 
-  numberOfColorsContext.subscribe((value) => {
-    numberOfColorsContextValue = value;
-    console.log('Current Value:', numberOfColorsContextValue);
-  });
+  // numberOfColorsStore.subscribe((value) => {
+  //   numberOfColorsStoreValue = value;
+  //   console.log('Current Value:', numberOfColorsStoreValue);
+  // });
   // console.log(message);
-  $: {
-    console.log(numberOfColorsContext);
-    // const splitxs = getContext<number>('numberOfColors');
-    // currentMessage = get(message);
-    // console.log('Current Message:', message);
-  }
+  // $: {
+  //   console.log(numberOfColorsStore);
+  //   // const splitxs = getContext<number>('numberOfColors');
+  //   // currentMessage = get(message);
+  //   // console.log('Current Message:', message);
+  // }
 
-  onMount(() => {
+  $: {
     // currentMessage = get(message);
     // const fileInput = document.querySelector(
     //   '.upload__image',
@@ -38,10 +43,6 @@
 
     const upload = document.querySelector('.upload__image') as HTMLInputElement;
 
-    console.log(upload);
-    // upload?.addEventListener('change', (e) => {
-    //   console.log('CLICK');
-    // });
     if (!upload) {
       return;
     }
@@ -180,7 +181,7 @@
       const sourceBuffer32 = new Int32Array(data.data.buffer);
 
       getAllColors({
-        splits: numberOfColorsContextValue,
+        splits: $numberOfColorsStore,
         sourceBuffer8,
         sourceBuffer32,
       });
@@ -274,7 +275,7 @@
     initialize();
 
     console.log({ canvas, canvas2, canvas3 });
-  });
+  }
 </script>
 
 <!-- <header class="header">
@@ -307,21 +308,53 @@
     </li>
   </ul>
 </header> -->
-<section class="settings clearfix">
+<Drawer>
+  <section class="codes">
+    <button class="codes__close">fermer</button>
+    <!-- <h2 class="codes__title title title--normal">Couleur</h2> -->
+    <ul class="codes__list title title--normal">
+      <li class="code code__hex">
+        <span class="code__name">HEX</span>
+        <span class="code__color" />
+      </li>
+      <li class="code code__rgb">
+        <span class="code__name">RGB</span>
+        <span class="code__color" />
+      </li>
+      <li class="code code__lab">
+        <span class="code__name">LAB</span>
+        <span class="code__color" />
+      </li>
+      <li class="code code__cmjn">
+        <span class="code__name">CMJN</span>
+        <span class="code__color" />
+      </li>
+      <li class="code code__hsv">
+        <span class="code__name">HSV</span>
+        <span class="code__color" />
+      </li>
+      <li class="code code__hsl">
+        <span class="code__name">HSL</span>
+        <span class="code__color" />
+      </li>
+    </ul>
+  </section>
+</Drawer>
+<section class="settings">
   <h2 class="hide">Paramètres</h2>
   <div class="canvas__container">
     <div class="canvas">
-      <div class="description">
-        <p class="title title--up title--bold">
+      <!-- <div class="description"> -->
+      <!-- <p class="title title--up title--bold">
           Crée une palette de couleurs à partir de tes photos.
-        </p>
-      </div>
+        </p> -->
+      <!-- </div> -->
       <canvas id="canvas" class="canvas__main" />
       <canvas id="canvas2" class="canvas__drawon" />
       <canvas id="canvas3" class="canvas__quality" />
       <div class="upload__icon">Upload file icon</div>
       <div class="upload">
-        <span>Drag &amp; drop ton image ici</span>
+        <!-- <span>Drag &amp; drop ton image ici</span> -->
         <input
           class="upload__image"
           type="file"
@@ -331,17 +364,18 @@
         />
       </div>
     </div>
-    <p class="canvas__advice">
+    <!-- <p class="canvas__advice">
       Sélectionne une zone de l’image pour en récupérer sa palette.
-    </p>
+    </p> -->
   </div>
   <ul class="controls">
     <li class="tg-list-item">
-      <input class="tgl tgl-light" id="cb1" type="checkbox" />
-      <label class="tgl-btn" for="cb1" />
-      <p class="controls__label--desktop">
+      <!-- <input class="tgl tgl-light" id="cb1" type="checkbox" />
+      <label class="tgl-btn" for="cb1" /> -->
+      <!-- <p class="controls__label--desktop">
         Améliorer la précision des couleurs.
       </p>
+    </li> -->
     </li>
     <li class="radial radial__colors">
       <ColorRange />
@@ -350,38 +384,10 @@
 </section>
 <section class="palette">
   <h2 class="hide">Palette</h2>
+  <button on:click={() => toggleColorFlowDrawer(true)}>codes</button>
   <ul class="colors title title--normal" />
 </section>
-<section class="codes">
-  <button class="codes__close">fermer</button>
-  <h2 class="codes__title title title--normal">Couleur</h2>
-  <ul class="codes__list title title--normal">
-    <li class="code code__hex">
-      <span class="code__name">HEX</span>
-      <span class="code__color" />
-    </li>
-    <li class="code code__rgb">
-      <span class="code__name">RGB</span>
-      <span class="code__color" />
-    </li>
-    <li class="code code__lab">
-      <span class="code__name">LAB</span>
-      <span class="code__color" />
-    </li>
-    <li class="code code__cmjn">
-      <span class="code__name">CMJN</span>
-      <span class="code__color" />
-    </li>
-    <li class="code code__hsv">
-      <span class="code__name">HSV</span>
-      <span class="code__color" />
-    </li>
-    <li class="code code__hsl">
-      <span class="code__name">HSL</span>
-      <span class="code__color" />
-    </li>
-  </ul>
-</section>
+
 <section class="help">
   <h2 class="help__title">F.A.Q</h2>
   <div class="help__question col col--center">

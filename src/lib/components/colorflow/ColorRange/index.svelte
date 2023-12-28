@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { numberOfColorsContext } from '../../../../shared/context';
+  import { numberOfColorsStore } from '../../../../shared/context';
 
   // import { onMount } from 'svelte';
   // import { onMount, setContext } from 'svelte';
@@ -14,7 +14,7 @@
     rangeValue = Number(inputElement.value);
     // setContext<number>('numberOfColors', rangeValue);
     // $message = Number(inputElement.value);
-    numberOfColorsContext.set(rangeValue);
+    numberOfColorsStore.set(rangeValue);
   };
 </script>
 
@@ -29,5 +29,5 @@
   bind:value={rangeValue}
   on:input={handleRangeInput}
 />
-<p>Range value: {rangeValue}</p>
+<!-- <p>Range value: {rangeValue}</p> -->
 <!-- </div> -->

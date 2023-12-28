@@ -340,7 +340,7 @@ export const getMostSimilarColor = (colorNames: Color[], lab: number[]) => {
     }
   });
 
-  console.log({ mostSimilarColor00, mostSimilarColor });
+  // console.log({ mostSimilarColor00, mostSimilarColor });
 
   // return mostSimilarColor00?.color || '';
   return mostSimilarColor?.color || '';
@@ -481,15 +481,12 @@ export const getBucketsSplit = (
   let count = 0;
   let increment = 2;
 
-  console.log(dominantSort);
-
   let splitBucket = twoBucketSplit(dominantSort, median, bucket);
   while (increment < splits) {
     let medianCut1 = medianCut(splitBucket[count]);
 
     let lastCount = count;
     count = count + 1;
-    console.log(dominantSort, splitBucket[lastCount]);
 
     splitBucket = twoBucketSplit(splitBucket[lastCount], medianCut1, bucket);
 
@@ -501,7 +498,6 @@ export const getBucketsSplit = (
 
   /* Prevent getting empty arrays if number of colors is less than number of splits */
   var NoEmptyBucket = splitBucket.filter((bucket) => bucket.length != 0);
-  console.log({ splitBucket });
   var mappedColors = averageColor(NoEmptyBucket);
   return mappedColors;
 };
@@ -539,7 +535,6 @@ const sortByBucketSize = (buckets: number[][][]) => {
     return [b, percentage];
   });
 
-  console.log(buckets);
   return sortedBuckets;
 };
 
@@ -547,7 +542,6 @@ export const averageColor = (buckets: number[][][]) => {
   var mappedColors: [number[], number][] = [];
 
   var bucketsSorted = sortByBucketSize(buckets);
-  console.log({ bucketsSorted });
   bucketsSorted.forEach((bucket) => {
     const reduced = bucket[0]
       .filter((a, b) => a[0] <= 255 && a[1] <= 255 && a[2] <= 255)
@@ -566,8 +560,6 @@ export const averageColor = (buckets: number[][][]) => {
     const color = [zero, one, two];
     mappedColors.push([color, bucket[1]]);
   });
-
-  console.log(bucketsSorted, mappedColors);
 
   return mappedColors;
 };
@@ -671,8 +663,6 @@ export const twoBucketSplit = (
       bucket2[bucket2.length] = color;
     }
   });
-
-  console.log({ colors, median, bucket, bucket1, bucket2 });
 
   bucket.push(bucket1, bucket2);
 
